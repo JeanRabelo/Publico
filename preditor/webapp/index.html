@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      input[type="text"] {
+        padding: 5px;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+      button {
+        padding: 5px 10px;
+        font-size: 16px;
+      }
+      .result {
+        margin-top: 10px;
+        font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Word Association Finder</h2>
+    <p>Type a word and see the associated words:</p>
+    <input type="text" id="wordInput" placeholder="Enter a word">
+    <button onclick="findAssociatedWords()">Search</button>
+
+    <div id="result" class="result"></div>
+
+    <script>
+      // JSON data
+      const wordAssociations = {
+        "elemento": ["seco"],
+        "minha": ["alma", "mão", "boca"],
+        "ela": ["se", "e", "não"],
+        "será": ["o", "a", "de"]
+      };
+
+      // Function to find associated words
+      function findAssociatedWords() {
+        const word = document.getElementById("wordInput").value.trim().toLowerCase();
+        const resultDiv = document.getElementById("result");
+
+        // Clear previous result
+        resultDiv.innerHTML = '';
+
+        // Check if the word has associations
+        if (wordAssociations[word]) {
+          // Display associated words
+          resultDiv.innerHTML = `<strong>Associated words for "${word}":</strong> ${wordAssociations[word].join(', ')}`;
+        } else {
+          // If no associations found
+          resultDiv.innerHTML = `<strong>No associations found for "${word}".</strong>`;
+        }
+      }
+    </script>
+  </body>
+</html>
+
