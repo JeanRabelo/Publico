@@ -8,27 +8,35 @@
         font-family: Arial, sans-serif;
         margin: 20px;
       }
+      /* make the input text long */
       input[type="text"] {
         padding: 5px;
         font-size: 16px;
         margin-bottom: 10px;
+	width: 30%;
       }
       .result {
         margin-top: 10px;
         font-size: 18px;
       }
       a {
-          padding: 10px;
-          margin: 10px 0;
-          text-decoration: none;
-          color: #333;
-          border: 1px solid #333;
-          border-radius: 5px;
-          width: 200px;
-          margin: auto;
+        padding: 10px;
+        margin: 10px 0;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #333;
+        border-radius: 5px;
+        width: 200px;
+        margin: auto;
       }
       a:hover {
-          background-color: #f0f0f0;
+        background-color: #f0f0f0;
+      }
+      .button {
+        padding: 5px 10px;
+        margin: 5px;
+        font-size: 16px;
+        cursor: pointer;
       }
     </style>
   </head>
@@ -25790,12 +25798,27 @@
 
         // Check if the last word has associations
         if (wordAssociations[lastWord]) {
-          // Display associated words
-          resultDiv.innerHTML = `<strong>Associated words for "${lastWord}":</strong> ${wordAssociations[lastWord].join(', ')}`;
+          // Display associated words as buttons
+          resultDiv.innerHTML = `<strong>Associated words for "${lastWord}":</strong>`;
+          wordAssociations[lastWord].forEach(word => {
+            const button = document.createElement("button");
+            button.className = "button";
+            button.textContent = word;
+            button.onclick = () => addWordToInput(word);
+            resultDiv.appendChild(button);
+          });
         } else {
           // If no associations found
           resultDiv.innerHTML = `<strong>No associations found for "${lastWord}".</strong>`;
         }
+      }
+
+      // Function to add word to input field
+      function addWordToInput(word) {
+        const inputField = document.getElementById("wordInput");
+        inputField.value = inputField.value.trim() + " " + word;
+        inputField.focus();
+	findAssociatedWords();
       }
     </script>
   </body>
