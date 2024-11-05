@@ -8,16 +8,16 @@
         font-family: Arial, sans-serif;
         margin: 20px;
       }
-      /* make the input text long */
       input[type="text"] {
         padding: 5px;
         font-size: 16px;
         margin-bottom: 10px;
-	width: 30%;
       }
       .result {
         margin-top: 10px;
         font-size: 18px;
+        display: flex;
+        align-items: center;
       }
       a {
         padding: 10px;
@@ -34,9 +34,15 @@
       }
       .button {
         padding: 5px 10px;
-        margin: 5px;
+        margin: 5px 0;
         font-size: 16px;
         cursor: pointer;
+        display: block;
+      }
+      .button-container {
+        margin-left: 20px;
+        display: flex;
+        flex-direction: column;
       }
     </style>
   </head>
@@ -25798,15 +25804,25 @@
 
         // Check if the last word has associations
         if (wordAssociations[lastWord]) {
+          // Create the label for associated words
+          const label = document.createElement("strong");
+          label.innerHTML = `Associated words for "${lastWord}":`;
+          resultDiv.appendChild(label);
+
+          // Create a container for buttons
+          const buttonContainer = document.createElement("div");
+          buttonContainer.className = "button-container";
+
           // Display associated words as buttons
-          resultDiv.innerHTML = `<strong>Associated words for "${lastWord}":</strong>`;
           wordAssociations[lastWord].forEach(word => {
             const button = document.createElement("button");
             button.className = "button";
             button.textContent = word;
             button.onclick = () => addWordToInput(word);
-            resultDiv.appendChild(button);
+            buttonContainer.appendChild(button);
           });
+
+          resultDiv.appendChild(buttonContainer);
         } else {
           // If no associations found
           resultDiv.innerHTML = `<strong>No associations found for "${lastWord}".</strong>`;
@@ -25818,7 +25834,7 @@
         const inputField = document.getElementById("wordInput");
         inputField.value = inputField.value.trim() + " " + word;
         inputField.focus();
-	findAssociatedWords();
+      	findAssociatedWords();
       }
     </script>
   </body>
