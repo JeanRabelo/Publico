@@ -8,10 +8,19 @@
         font-family: Arial, sans-serif;
         margin: 20px;
       }
-      input[type="text"] {
-        padding: 5px;
-        font-size: 16px;
-        margin-bottom: 10px;
+      .resizable-container {
+        display: inline-block;
+        resize: both;
+        overflow: auto;
+        border: 1px solid #ccc;
+        padding: 4px;
+      }
+      .resizable-container input[type="text"] {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 4px;
+        border: none;
+        outline: none;
       }
       .result {
         margin-top: 10px;
@@ -50,7 +59,9 @@
     <a href="index.html">Voltar</a>
     <h2>Bíblia - João Ferreira de Almeida</h2>
     <p>Escreva uma palavra para encontrar palavras associadas</p>
-    <input type="text" id="wordInput" placeholder="Enter a word" oninput="findAssociatedWords()">
+    <div class="resizable-container">
+      <input type="text" id="wordInput" placeholder="Escreva uma palavra" oninput="findAssociatedWords()">
+    </div>
 
     <div id="result" class="result"></div>
 
@@ -25839,4 +25850,3 @@
     </script>
   </body>
 </html>
-
