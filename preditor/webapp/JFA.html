@@ -34,8 +34,8 @@
   </head>
   <body>
     <a href="index.html">Voltar</a>
-    <h2>Word Association Finder</h2>
-    <p>Type a word and see the associated words:</p>
+    <h2>Bíblia - João Ferreira de Almeida</h2>
+    <p>Escreva uma palavra para encontrar palavras associadas</p>
     <input type="text" id="wordInput" placeholder="Enter a word" oninput="findAssociatedWords()">
 
     <div id="result" class="result"></div>
@@ -25780,19 +25780,21 @@
 
       // Function to find associated words
       function findAssociatedWords() {
-        const word = document.getElementById("wordInput").value.trim().toLowerCase();
+        const input = document.getElementById("wordInput").value.trim().toLowerCase();
+        const words = input.split(" ");
+        const lastWord = words[words.length - 1];
         const resultDiv = document.getElementById("result");
 
         // Clear previous result
         resultDiv.innerHTML = '';
 
-        // Check if the word has associations
-        if (wordAssociations[word]) {
+        // Check if the last word has associations
+        if (wordAssociations[lastWord]) {
           // Display associated words
-          resultDiv.innerHTML = `<strong>Associated words for "${word}":</strong> ${wordAssociations[word].join(', ')}`;
+          resultDiv.innerHTML = `<strong>Associated words for "${lastWord}":</strong> ${wordAssociations[lastWord].join(', ')}`;
         } else {
           // If no associations found
-          resultDiv.innerHTML = `<strong>No associations found for "${word}".</strong>`;
+          resultDiv.innerHTML = `<strong>No associations found for "${lastWord}".</strong>`;
         }
       }
     </script>
