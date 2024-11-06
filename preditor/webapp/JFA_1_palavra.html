@@ -15,12 +15,15 @@
         border: 1px solid #ccc;
         padding: 4px;
       }
-      .resizable-container input[type="text"] {
+      .resizable-container textarea {
         width: 100%;
+        height: 50px;
         box-sizing: border-box;
         padding: 4px;
         border: none;
         outline: none;
+        resize: none;
+        overflow-wrap: break-word;
       }
       .result {
         margin-top: 10px;
@@ -60,7 +63,7 @@
     <h2>Bíblia - João Ferreira de Almeida</h2>
     <p>Escreva uma palavra para encontrar palavras associadas</p>
     <div class="resizable-container">
-      <input type="text" id="wordInput" placeholder="Escreva uma palavra" oninput="findAssociatedWords()">
+      <textarea id="wordInput" placeholder="Escreva uma palavra" oninput="findAssociatedWords()"></textarea>
     </div>
 
     <div id="result" class="result"></div>
@@ -25845,8 +25848,9 @@
         const inputField = document.getElementById("wordInput");
         inputField.value = inputField.value.trim() + " " + word;
         inputField.focus();
-      	findAssociatedWords();
+        findAssociatedWords();
       }
     </script>
   </body>
 </html>
+
