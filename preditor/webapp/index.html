@@ -12,32 +12,77 @@
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-color: #f5f5f5;
         }
         .menu {
+            width: 80%;
+            max-width: 800px;
             text-align: center;
         }
-        .menu a {
-            display: block;
-            padding: 10px;
-            margin: 10px 0;
-            text-decoration: none;
-            color: #333;
-            border: 1px solid #333;
-            border-radius: 5px;
-            width: 200px;
-            margin: auto;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .menu a:hover {
-            background-color: #f0f0f0;
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+        }
+        td.document-name {
+            font-weight: bold;
+            color: #666;
+            text-align: left;
+            padding-left: 20px;
+        }
+        td a {
+            text-decoration: none;
+            color: #0073e6;
+            display: inline-block;
+            padding: 8px 12px;
+            border-radius: 5px;
+            background-color: #e6f3ff;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        td a:hover {
+            background-color: #cce6ff;
+            color: #005bb5;
         }
     </style>
 </head>
 <body>
     <div class="menu">
         <h1>Índice</h1>
-        <a href="JFA_1_palavra.html">Bíblia - João Ferreira de Almeida (1 palavra)</a>
-        <a href="JFA_2_palavras.html">Bíblia - João Ferreira de Almeida (2 palavras)</a>
-        <a href="JFA_3_palavras.html">Bíblia - João Ferreira de Almeida (3 palavras)</a>
+        <table>
+            <tr>
+                <th>Documento</th>
+                <th>1 Palavra</th>
+                <th>2 Palavras</th>
+                <th>3 Palavras</th>
+            </tr>
+            <tr>
+                <td class="document-name">Bíblia - João Ferreira de Almeida</td>
+                <td><a href="JFA_1_palavra.html">1 Palavra</a></td>
+                <td><a href="JFA_2_palavras.html">2 Palavras</a></td>
+                <td><a href="JFA_3_palavras.html">3 Palavras</a></td>
+            </tr>
+            <tr>
+                <td class="document-name">Frozen</td>
+                <td><a href="Frozen_1_palavra.html">1 Palavra</a></td>
+                <td><a href="Frozen_2_palavras.html">2 Palavras</a></td>
+                <td><a href="Frozen_3_palavras.html">3 Palavras</a></td>
+            </tr>
+            <tr>
+                <td class="document-name">Constituição Americana</td>
+                <td><a href="Constituição_Americana_1_palavra.html">1 Palavra</a></td>
+                <td><a href="Constituição_Americana_2_palavras.html">2 Palavras</a></td>
+                <td><a href="Constituição_Americana_3_palavras.html">3 Palavras</a></td>
+            </tr>
+        </table>
     </div>
 </body>
 </html>
