@@ -17,7 +17,7 @@ def place_piece(board, piece, x, y):
     return new_board
 
 def find_all_positions(board, piece):
-    """Find and print all positions where the piece can fit within the board."""
+    """Find all positions where the piece can fit within the board."""
     board_rows, board_cols = board.shape
     piece_rows, piece_cols = piece.shape
     fits = []
@@ -30,13 +30,31 @@ def find_all_positions(board, piece):
 
     return fits
 
+def eliminate_lines(fits):
+    """Substitute rows and columns with all ones by zeroes in each fit."""
+    fits_after_lines_elimination = []
+    for fit in fits:
+        fit_copy = fit.copy()
+        
+        # Replace rows with all ones by zeroes
+        row_mask = np.all(fit_copy == 1, axis=1)
+        fit_copy[row_mask, :] = 0
+        
+        # Replace columns with all ones by zeroes
+        col_mask = np.all(fit_copy == 1, axis=0)
+        fit_copy[:, col_mask] = 0
+        
+        fits_after_lines_elimination.append(fit_copy)
+    
+    return fits_after_lines_elimination
+
 # Example usage:
 board = np.array([
-    [0, 0, 1, 0, 0],
-    [1, 0, 1, 0, 0],
-    [0, 0, 0, 1, 0],
+    [1, 1, 1, 0, 0],
+    [1, 1, 1, 0, 0],
+    [1, 1, 0, 1, 0],
     [0, 1, 0, 0, 0],
-    [0, 0, 0, 0, 0]
+    [1, 0, 0, 0, 0]
 ])
 
 piece = np.array([
@@ -47,8 +65,11 @@ piece = np.array([
 # Find all fits
 fits = find_all_positions(board, piece)
 
+# Apply line elimination
+fits_after_lines_elimination = eliminate_lines(fits)
+
 # Display results
-print("Possible fits of the piece within the board:")
-for i, fit in enumerate(fits, 1):
+print("Possible fits of the piece within the board after eliminating full rows and columns of ones:")
+for i, fit in enumerate(fits_after_lines_elimination, 1):
     print(f"Fit {i}:\n{fit}\n")
 
