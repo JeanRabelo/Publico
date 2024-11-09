@@ -48,28 +48,105 @@ def eliminate_lines(fits):
     
     return fits_after_lines_elimination
 
+def place_pieces_sequentially(board, pieces):
+    """Place each piece consecutively on the board, updating and eliminating lines after each placement."""
+    current_board = board.copy()
+    plays = []
+
+    for i, piece in enumerate(pieces, 1):
+        fits = find_all_positions(current_board, piece)
+        
+        if not fits:
+            print(f"No fit found for piece {i}.\n")
+            return []
+        
+        # Apply line elimination
+        fits_after_elimination = eliminate_lines(fits)
+        for j, fit in enumerate(fits_after_elimination, 1):
+            current_play = {
+                "pieces_ahead": len(pieces) - 1,
+                "placement": j,
+                "board": fit,
+                "sum": np.sum(fit)
+            }
+            # if the last piece was placed, current_play["next"] will be None, otherwise, it will be a list of plays, to be filled in the next iteration
+            if len(pieces) == 1:
+                current_play["next"] = None
+            else:
+                current_play["next"] = place_pieces_sequentially(fit, pieces[:i-1] + pieces[i:])
+            plays.append(current_play)
+    
+    return plays
+
 # Example usage:
 board = np.array([
-    [1, 1, 1, 0, 0],
-    [1, 1, 1, 0, 0],
-    [1, 1, 0, 1, 0],
-    [0, 1, 0, 0, 0],
-    [1, 0, 0, 0, 0]
-])
+    [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0],
+    [1, 0, 1, 0, 0, 0, 1, 1, 1, 1, 1],
+    [0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1],
+    [1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1],
+    [1, 1, 0, 1, 1, 0, 1, 1, 1, 0, 1],
+    [0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0],
+    [1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1],
+    [1, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0]
+    ])
 
-piece = np.array([
-    [1, 0],
-    [0, 1]
-])
 
-# Find all fits
-fits = find_all_positions(board, piece)
 
-# Apply line elimination
-fits_after_lines_elimination = eliminate_lines(fits)
 
-# Display results
-print("Possible fits of the piece within the board after eliminating full rows and columns of ones:")
-for i, fit in enumerate(fits_after_lines_elimination, 1):
-    print(f"Fit {i}:\n{fit}\n")
+pieces = [
+    np.array([[1, 1, 1]]),
+    np.array([[1, 1],
+              [1, 1],
+              [1, 1]]),
+    np.array([[1],
+              [1],
+              [1],
+              [1]])
+]
 
+# Place pieces consecutively
+plays = place_pieces_sequentially(board, pieces)
+
+def print_board(board, indent=0):
+    """Print the board in a nested format."""
+    for row in board:
+        print("  " * indent, row)
+
+
+def print_plays(plays, indent=0):
+    """Print the plays in a nested format."""
+    for play in plays:
+        print("  " * indent, f"Pieces ahead {play['pieces_ahead']} - Placement {play['placement']} - Sum {play['sum']}")
+        print_board(play["board"], indent)
+        if play["next"]:
+            print_plays(play["next"], indent + 1)
+
+print_plays(plays)
+
+# create a plays_min variable to store only the 3 paths with the minimum final sum
+plays_min = []
+# create a variable to store the minimum sum found
+min_sum = float("inf")
+
+def find_min_sum(plays, plays_min, min_sum):
+    """Find the minimum sum of the final board configuration and the corresponding plays."""
+    for play in plays:
+        if play["next"]:
+            min_sum, plays_min = find_min_sum(play["next"], plays_min, min_sum)
+        elif play["pieces_ahead"] == 0:
+            if play["sum"] < min_sum:
+                min_sum = play["sum"]
+                plays_min = [play]
+            elif play["sum"] == min_sum:
+                plays_min.append(play)
+    
+    return min_sum, plays_min
+
+min_sum, plays_min = find_min_sum(plays, plays_min, min_sum)
+
+print(f"\nMinimum sum: {min_sum}")
+print("Paths with minimum sum:")
+print_plays(plays_min)
