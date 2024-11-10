@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Interactive Board Input</title>
+    <title>Interactive Board and Pieces Input</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 40px;
         }
-        .grid-container {
+        .grid-container, .piece-container {
             display: inline-block;
             margin-bottom: 20px;
         }
@@ -37,44 +37,51 @@
         }
         .message {
             margin-top: 20px;
-            color: green;
+                color: green;
         }
         .controls {
             margin-bottom: 20px;
         }
         .controls input {
             width: 50px;
+            margin-right: 10px;
+        }
+        .piece-section {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+        .piece-section h3 {
+            margin-top: 0;
         }
     </style>
 </head>
 <body>
-    <h1>Interactive Board Input</h1>
+    <h1>Interactive Board and Pieces Input</h1>
     <div class="controls">
-        <label for="rows">Rows:</label>
+        <label for="rows">Board Rows:</label>
         <input type="number" id="rows" value="5" min="1" max="20">
-        <label for="cols">Columns:</label>
+        <label for="cols">Board Columns:</label>
         <input type="number" id="cols" value="5" min="1" max="20">
     </div>
     <form method="post" onsubmit="return submitForm()">
-        <div id="grid" class="grid-container"></div>
+        <h2>Board Configuration</h2>
+        <div id="boardGrid" class="grid-container"></div>
         <input type="hidden" name="boardData" id="boardData">
-        <label for="pieces">Pieces (enter as list of arrays, e.g. [[[1,1]], [[1],[1]]]):</label><br>
-        <textarea name="pieces" rows="10" cols="50">[
-    [[1, 1, 1]],
-    [[1, 1],
-     [1, 1],
-     [1, 1]],
-    [[1],
-     [1],
-     [1],
-     [1]]
-]</textarea><br><br>
+        
+        <h2>Pieces Configuration</h2>
+        <label for="numPieces">Number of Pieces:</label>
+        <input type="number" id="numPieces" value="1" min="1" max="10">
+        <div id="piecesContainer"></div>
+        <input type="hidden" name="pieces" id="piecesData">
+        
         <input type="submit" value="Submit">
     </form>
     {% if message %}
         <p class="message">{{ message }}</p>
     {% endif %}
     <script>
+        // Board Variables and Functions
         let board = [];
         function generateBoard() {
             const rows = parseInt(document.getElementById('rows').value);
@@ -84,7 +91,7 @@
             const oldBoard = board;
             board = [];
 
-            const gridContainer = document.getElementById('grid');
+            const gridContainer = document.getElementById('boardGrid');
             gridContainer.innerHTML = '';
 
             for (let r = 0; r < rows; r++) {
@@ -107,14 +114,14 @@
 
                     cellDiv.dataset.row = r;
                     cellDiv.dataset.col = c;
-                    cellDiv.addEventListener('click', toggleCell);
+                    cellDiv.addEventListener('click', toggleBoardCell);
                     rowDiv.appendChild(cellDiv);
                 }
                 gridContainer.appendChild(rowDiv);
             }
         }
         
-        function toggleCell(event) {
+        function toggleBoardCell(event) {
             const cell = event.target;
             const row = parseInt(cell.dataset.row);
             const col = parseInt(cell.dataset.col);
@@ -129,16 +136,180 @@
             }
         }
 
+        // Pieces Variables and Functions
+        let pieces = [];
+        function generatePieces(num) {
+            const piecesContainer = document.getElementById('piecesContainer');
+            const oldPieces = pieces;
+            pieces = [];
+
+            piecesContainer.innerHTML = '';
+
+            for (let p = 0; p < num; p++) {
+                const pieceSection = document.createElement('div');
+                pieceSection.className = 'piece-section';
+                pieceSection.id = `piece-${p+1}`;
+
+                const pieceHeader = document.createElement('h3');
+                pieceHeader.textContent = `Piece ${p+1}`;
+                pieceSection.appendChild(pieceHeader);
+
+                const rowLabel = document.createElement('label');
+                rowLabel.textContent = 'Rows: ';
+                pieceSection.appendChild(rowLabel);
+
+                const rowInput = document.createElement('input');
+                rowInput.type = 'number';
+                rowInput.value = (oldPieces[p] && oldPieces[p].rows) ? oldPieces[p].rows : 3;
+                rowInput.min = 1;
+                rowInput.max = 10;
+                rowInput.dataset.piece = p;
+                rowInput.addEventListener('change', () => updatePieceGrid(p));
+                pieceSection.appendChild(rowInput);
+
+                const colLabel = document.createElement('label');
+                colLabel.textContent = ' Columns: ';
+                pieceSection.appendChild(colLabel);
+
+                const colInput = document.createElement('input');
+                colInput.type = 'number';
+                colInput.value = (oldPieces[p] && oldPieces[p].cols) ? oldPieces[p].cols : 3;
+                colInput.min = 1;
+                colInput.max = 10;
+                colInput.dataset.piece = p;
+                colInput.addEventListener('change', () => updatePieceGrid(p));
+                pieceSection.appendChild(colInput);
+
+                const pieceGrid = document.createElement('div');
+                pieceGrid.className = 'grid-container';
+                pieceGrid.id = `pieceGrid-${p}`;
+                pieceSection.appendChild(pieceGrid);
+
+                piecesContainer.appendChild(pieceSection);
+
+                // Initialize piece data
+                if (oldPieces[p]) {
+                    pieces[p] = {
+                        rows: oldPieces[p].rows,
+                        cols: oldPieces[p].cols,
+                        grid: oldPieces[p].grid
+                    };
+                } else {
+                    pieces[p] = {
+                        rows: 3,
+                        cols: 3,
+                        grid: []
+                    };
+                }
+
+                generatePieceGrid(p);
+            }
+        }
+
+        function generatePieceGrid(p) {
+            const piece = pieces[p];
+            const rows = piece.rows;
+            const cols = piece.cols;
+            const gridContainer = document.getElementById(`pieceGrid-${p}`);
+            gridContainer.innerHTML = '';
+
+            for (let r = 0; r < rows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'grid-row';
+                piece.grid[r] = piece.grid[r] || [];
+                for (let c = 0; c < cols; c++) {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'grid-cell';
+
+                    // Restore cell state if it exists in the old piece
+                    if (piece.grid[r] && piece.grid[r][c] === 1) {
+                        cellDiv.classList.add('active');
+                        cellDiv.textContent = '1';
+                        piece.grid[r][c] = 1;
+                    } else {
+                        cellDiv.textContent = '0';
+                        piece.grid[r][c] = 0;
+                    }
+
+                    cellDiv.dataset.piece = p;
+                    cellDiv.dataset.row = r;
+                    cellDiv.dataset.col = c;
+                    cellDiv.addEventListener('click', togglePieceCell);
+                    rowDiv.appendChild(cellDiv);
+                }
+                gridContainer.appendChild(rowDiv);
+            }
+        }
+
+        function togglePieceCell(event) {
+            const cell = event.target;
+            const p = parseInt(cell.dataset.piece);
+            const row = parseInt(cell.dataset.row);
+            const col = parseInt(cell.dataset.col);
+            if (pieces[p].grid[row][col] === 0) {
+                pieces[p].grid[row][col] = 1;
+                cell.classList.add('active');
+                cell.textContent = '1';
+            } else {
+                pieces[p].grid[row][col] = 0;
+                cell.classList.remove('active');
+                cell.textContent = '0';
+            }
+        }
+
+        function updatePieceGrid(p) {
+            const pieceSection = document.getElementById(`piece-${p+1}`);
+            const rowInput = pieceSection.querySelector('input[type=number]:nth-of-type(1)');
+            const colInput = pieceSection.querySelector('input[type=number]:nth-of-type(2)');
+            const newRows = parseInt(rowInput.value);
+            const newCols = parseInt(colInput.value);
+
+            // Update piece data
+            pieces[p].rows = newRows;
+            pieces[p].cols = newCols;
+
+            // Adjust the grid array
+            const oldGrid = pieces[p].grid;
+            pieces[p].grid = [];
+            for (let r = 0; r < newRows; r++) {
+                pieces[p].grid[r] = [];
+                for (let c = 0; c < newCols; c++) {
+                    if (oldGrid[r] && oldGrid[r][c] !== undefined) {
+                        pieces[p].grid[r][c] = oldGrid[r][c];
+                    } else {
+                        pieces[p].grid[r][c] = 0;
+                    }
+                }
+            }
+
+            generatePieceGrid(p);
+        }
+
         function submitForm() {
+            // Set board data
             document.getElementById('boardData').value = JSON.stringify(board);
+
+            // Collect pieces data
+            const piecesData = pieces.map(piece => {
+                const grid = piece.grid.map(row => row.slice());
+                return grid;
+            });
+            document.getElementById('piecesData').value = JSON.stringify(piecesData);
+
             return true;
         }
 
-        // Generate default board on page load
+        // Initialize Board
         generateBoard();
-        // Add event listeners to rows and cols input elements
         document.getElementById('rows').addEventListener('input', generateBoard);
         document.getElementById('cols').addEventListener('input', generateBoard);
+
+        // Initialize Pieces
+        generatePieces(parseInt(document.getElementById('numPieces').value));
+        document.getElementById('numPieces').addEventListener('input', () => {
+            const num = parseInt(document.getElementById('numPieces').value);
+            generatePieces(num);
+        });
     </script>
 </body>
 </html>
