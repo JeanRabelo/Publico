@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 import numpy as np
 import ast
 
@@ -118,22 +118,24 @@ def find_min_sum(plays, plays_min, min_sum):
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Get the board and pieces from the form
-        board_input = request.form.get('board')
+        # Get the board data from the form
+        board_data = request.form.get('boardData')
         pieces_input = request.form.get('pieces')
 
         # Process the board input into a numpy array
         try:
-            board_list = ast.literal_eval(board_input)
+            board_list = ast.literal_eval(board_data)
             board = np.array(board_list)
-        except:
+        except Exception as e:
+            print(f"Error parsing board data: {e}")
             return render_template('index.html', message='Invalid board input.')
 
         # Process the pieces input into list of numpy arrays
         try:
             pieces_list = ast.literal_eval(pieces_input)
             pieces = [np.array(piece) for piece in pieces_list]
-        except:
+        except Exception as e:
+            print(f"Error parsing pieces data: {e}")
             return render_template('index.html', message='Invalid pieces input.')
 
         # Run the functions
@@ -150,6 +152,13 @@ def index():
         return render_template('index.html', message='Processing complete. Check console for output.')
     else:
         return render_template('index.html')
+
+@app.route('/generate_board', methods=['POST'])
+def generate_board():
+    rows = int(request.form.get('rows', 5))
+    cols = int(request.form.get('cols', 5))
+    board = [[0 for _ in range(cols)] for _ in range(rows)]
+    return jsonify(board=board)
 
 if __name__ == '__main__':
     app.run(debug=True)
