@@ -135,7 +135,12 @@ def find_min_sum(plays, plays_min, min_sum):
     """Find the minimum sum of the final board configuration and the corresponding plays."""
     for play in plays:
         if play["next"]:
+            old_plays_min = plays_min.copy()
             min_sum, plays_min = find_min_sum(play["next"], plays_min, min_sum)
+            if plays_min != old_plays_min:
+                if np.array([play["next"][0]["board"] == plays_min[-1]["board"]]).any():
+                    play['next'] = [plays_min[-1]]
+                    plays_min[-1] = play
         elif play["pieces_ahead"] == 0:
             if play["sum"] < min_sum:
                 min_sum = play["sum"]
