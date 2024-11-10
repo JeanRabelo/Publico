@@ -54,7 +54,6 @@
         <input type="number" id="rows" value="5" min="1" max="20">
         <label for="cols">Columns:</label>
         <input type="number" id="cols" value="5" min="1" max="20">
-        <!-- Button removed -->
     </div>
     <form method="post" onsubmit="return submitForm()">
         <div id="grid" class="grid-container"></div>
@@ -80,9 +79,14 @@
         function generateBoard() {
             const rows = parseInt(document.getElementById('rows').value);
             const cols = parseInt(document.getElementById('cols').value);
+            
+            // Store existing board state
+            const oldBoard = board;
             board = [];
+
             const gridContainer = document.getElementById('grid');
             gridContainer.innerHTML = '';
+
             for (let r = 0; r < rows; r++) {
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'grid-row';
@@ -90,16 +94,26 @@
                 for (let c = 0; c < cols; c++) {
                     const cellDiv = document.createElement('div');
                     cellDiv.className = 'grid-cell';
-                    cellDiv.textContent = '0';
+
+                    // Restore cell state if it exists in the old board
+                    if (oldBoard[r] && oldBoard[r][c] === 1) {
+                        cellDiv.classList.add('active');
+                        cellDiv.textContent = '1';
+                        board[r][c] = 1;
+                    } else {
+                        cellDiv.textContent = '0';
+                        board[r][c] = 0;
+                    }
+
                     cellDiv.dataset.row = r;
                     cellDiv.dataset.col = c;
                     cellDiv.addEventListener('click', toggleCell);
                     rowDiv.appendChild(cellDiv);
-                    board[r][c] = 0;
                 }
                 gridContainer.appendChild(rowDiv);
             }
         }
+        
         function toggleCell(event) {
             const cell = event.target;
             const row = parseInt(cell.dataset.row);
@@ -114,10 +128,12 @@
                 cell.textContent = '0';
             }
         }
+
         function submitForm() {
             document.getElementById('boardData').value = JSON.stringify(board);
             return true;
         }
+
         // Generate default board on page load
         generateBoard();
         // Add event listeners to rows and cols input elements
