@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Board and Pieces Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        textarea {
+            width: 100%;
+            font-family: monospace;
+        }
+        label {
+            font-weight: bold;
+        }
+        .message {
+            margin-top: 20px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Enter Board and Pieces</h1>
+    <form method="post">
+        <label for="board">Board (enter as list of lists, e.g. [[0,1],[1,0]]):</label><br>
+        <textarea name="board" rows="10" cols="50"></textarea><br><br>
+
+        <label for="pieces">Pieces (enter as list of arrays, e.g. [[[1,1]], [[1],[1]]]):</label><br>
+        <textarea name="pieces" rows="10" cols="50"></textarea><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+
+    {% if message %}
+        <p class="message">{{ message }}</p>
+    {% endif %}
+</body>
+</html>
+
