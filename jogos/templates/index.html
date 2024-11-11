@@ -60,9 +60,9 @@
     <h1>Interactive Board and Pieces Input</h1>
     <div class="controls">
         <label for="rows">Board Rows:</label>
-        <input type="number" id="rows" value="5" min="1" max="20">
+        <input type="number" id="rows" value="11" min="1" max="20">
         <label for="cols">Board Columns:</label>
-        <input type="number" id="cols" value="5" min="1" max="20">
+        <input type="number" id="cols" value="11" min="1" max="20">
     </div>
     <form method="post" onsubmit="return submitForm()">
         <h2>Board Configuration</h2>
@@ -71,7 +71,7 @@
         
         <h2>Pieces Configuration</h2>
         <label for="numPieces">Number of Pieces:</label>
-        <input type="number" id="numPieces" value="1" min="1" max="10">
+        <input type="number" id="numPieces" value="3" min="1" max="10">
         <div id="piecesContainer"></div>
         <input type="hidden" name="pieces" id="piecesData">
         
