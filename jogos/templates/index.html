@@ -54,6 +54,42 @@
         .piece-section h3 {
             margin-top: 0;
         }
+	/* New styles for JSON tree and collapsible sections */
+        .json-tree {
+            font-family: monospace;
+            margin: 20px 0;
+        }
+        .json-node {
+            margin-left: 20px;
+        }
+        .collapsible {
+            cursor: pointer;
+            user-select: none;
+        }
+        .collapsible:after {
+            content: " ▼";
+        }
+        .collapsible.collapsed:after {
+            content: " ▶";
+        }
+        .board-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, 30px);
+            gap: 2px;
+            margin-top: 10px;
+        }
+        .grid-cell {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border: 1px solid #ccc;
+        }
+        .active {
+            background-color: #4caf50;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -77,9 +113,8 @@
         
         <input type="submit" value="Submit">
     </form>
-    {% if message %}
-        <p class="message">{{ message }}</p>
-    {% endif %}
+    <div id="jsonTree" class="json-tree"></div>
+
     <script>
         // Board Variables and Functions
         let board = [];
@@ -310,6 +345,74 @@
             const num = parseInt(document.getElementById('numPieces').value);
             generatePieces(num);
         });
+	function renderBoard(boardArray, container) {
+            container.innerHTML = '';
+            const boardGrid = document.createElement('div');
+            boardGrid.className = 'board-grid';
+            boardGrid.style.gridTemplateColumns = `repeat(${boardArray[0].length}, 30px)`;
+
+            boardArray.forEach(row => {
+                row.forEach(cell => {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'grid-cell';
+                    cellDiv.textContent = cell;
+                    if (cell === 1) {
+                        cellDiv.classList.add('active');
+                    }
+                    boardGrid.appendChild(cellDiv);
+                });
+            });
+            container.appendChild(boardGrid);
+        }
+
+        function createJsonTree(node, container) {
+            Object.keys(node).forEach(key => {
+                const div = document.createElement('div');
+                div.className = 'json-node';
+
+                if (key === "board") {
+                    const boardLabel = document.createElement('div');
+                    boardLabel.textContent = "Board:";
+                    div.appendChild(boardLabel);
+
+                    const boardContainer = document.createElement('div');
+                    renderBoard(node[key], boardContainer);
+                    div.appendChild(boardContainer);
+
+                } else if (key === "next" && node[key]) {
+                    const collapsible = document.createElement('div');
+                    collapsible.textContent = "Next";
+                    collapsible.className = 'collapsible';
+                    collapsible.addEventListener('click', function() {
+                        this.classList.toggle('collapsed');
+                        nextContainer.style.display = nextContainer.style.display === 'none' ? 'block' : 'none';
+                    });
+
+                    const nextContainer = document.createElement('div');
+                    nextContainer.style.display = 'none';
+                    node[key].forEach(nextNode => createJsonTree(nextNode, nextContainer));
+
+                    div.appendChild(collapsible);
+                    div.appendChild(nextContainer);
+
+                } else {
+                    div.textContent = `${key}: ${node[key]}`;
+                }
+
+                container.appendChild(div);
+            });
+        }
+
+        // Initialize JSON tree rendering
+	// check if the variable `playsMin` is defined in the template
+	{% if plays_min %}
+        const playsMin = {{ plays_min|tojson }};
+        const jsonTreeContainer = document.getElementById('jsonTree');
+        playsMin.forEach(play => createJsonTree(play, jsonTreeContainer));
+	{% else %}
+	const jsonTreeContainer = document.getElementById('jsonTree');
+	jsonTreeContainer.textContent = 'No playsMin data available.';
+	{% endif %}
     </script>
 </body>
 </html>

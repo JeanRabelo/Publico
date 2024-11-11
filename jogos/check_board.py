@@ -82,20 +82,6 @@ def place_pieces_sequentially(board, pieces):
     
     return plays
 
-def print_board(board, indent=0):
-    """Print the board in a nested format."""
-    indent_str = "  " * indent
-    for row in board:
-        print(indent_str, row)
-
-def print_plays(plays, indent=0):
-    """Print the plays in a nested format."""
-    for play in plays:
-        print("  " * indent, f"Pieces ahead {play['pieces_ahead']} - Placement {play['placement']} - Sum {play['sum']}")
-        print_board(play["board"], indent)
-        if play["next"]:
-            print_plays(play["next"], indent + 1)
-
 def find_min_sum_path(plays):
     def helper(plays, min_sum = float('inf')):
         return_path = []
@@ -117,7 +103,6 @@ def find_min_sum_path(plays):
                         return_path.append(play)
         return return_path, min_sum
     return helper(plays)
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -144,15 +129,18 @@ def index():
 
         # Run the functions
         plays = place_pieces_sequentially(board, pieces)
-        print(f'type(plays): {type(plays)}')
-
         plays_min, min_sum = find_min_sum_path(plays)
+        # make the "board" key in each play a list of lists for easier rendering in the template
+        def convert_board_to_list(plays):
+            for play in plays:
+                play["board"] = play["board"].tolist()
+                play["sum"] = int(play["sum"])
+                if play["next"]:
+                    convert_board_to_list(play["next"])
+            return plays
+        plays_min = convert_board_to_list(plays_min)
 
-        print(f"\nMinimum sum: {min_sum}")
-        print("Paths with minimum sum:")
-        print_plays(plays_min)
-
-        return render_template('index.html', message='Processing complete. Check console for output.')
+        return render_template('index.html', plays_min=plays_min, min_sum=min_sum)
     else:
         return render_template('index.html')
 
@@ -165,4 +153,3 @@ def generate_board():
 
 if __name__ == '__main__':
     app.run(debug=True)
-
