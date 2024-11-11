@@ -96,24 +96,28 @@ def print_plays(plays, indent=0):
         if play["next"]:
             print_plays(play["next"], indent + 1)
 
-def find_min_sum(plays, plays_min, min_sum):
-    """Find the minimum sum of the final board configuration and the corresponding plays."""
-    for play in plays:
-        if play["next"]:
-            old_plays_min = plays_min.copy()
-            min_sum, plays_min = find_min_sum(play["next"], plays_min, min_sum)
-            if plays_min != old_plays_min:
-                if np.array([play["next"][0]["board"] == plays_min[-1]["board"]]).any():
-                    play['next'] = [plays_min[-1]]
-                    plays_min[-1] = play
-        elif play["pieces_ahead"] == 0:
-            if play["sum"] < min_sum:
-                min_sum = play["sum"]
-                plays_min = [play]
-            elif play["sum"] == min_sum:
-                plays_min.append(play)
-    
-    return min_sum, plays_min
+def find_min_sum_path(plays):
+    def helper(plays, min_sum = float('inf')):
+        return_path = []
+        for play in plays:
+            if play['next'] is None and play['pieces_ahead'] == 0:
+                if play['sum'] < min_sum:
+                    min_sum = play['sum']
+                    return_path = [play]
+                elif play['sum'] == min_sum:
+                    return_path.append(play)
+            elif play['next'] is not None:
+                path, new_min_sum = helper(play['next'], min_sum)
+                if path:
+                    play['next'] = path
+                    if new_min_sum < min_sum:
+                        min_sum = new_min_sum
+                        return_path = [play]
+                    elif new_min_sum == min_sum:
+                        return_path.append(play)
+        return return_path, min_sum
+    return helper(plays)
+
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -140,10 +144,9 @@ def index():
 
         # Run the functions
         plays = place_pieces_sequentially(board, pieces)
+        print(f'type(plays): {type(plays)}')
 
-        plays_min = []
-        min_sum = float('inf')
-        min_sum, plays_min = find_min_sum(plays, plays_min, min_sum)
+        plays_min, min_sum = find_min_sum_path(plays)
 
         print(f"\nMinimum sum: {min_sum}")
         print("Paths with minimum sum:")
