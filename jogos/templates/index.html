@@ -90,6 +90,16 @@
             background-color: #4caf50;
             color: white;
         }
+	.board-wrapper {
+            display: inline-block;
+            position: relative;
+        }
+        .center-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            right: -60px;
+        }
     </style>
 </head>
 <body>
@@ -345,7 +355,8 @@
             const num = parseInt(document.getElementById('numPieces').value);
             generatePieces(num);
         });
-	function renderBoard(boardArray, container) {
+
+	function renderBoard(boardArray, container, alignCenter = false) {
             container.innerHTML = '';
             const boardGrid = document.createElement('div');
             boardGrid.className = 'board-grid';
@@ -362,7 +373,55 @@
                     boardGrid.appendChild(cellDiv);
                 });
             });
-            container.appendChild(boardGrid);
+
+            if (alignCenter) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'board-wrapper';
+
+                // Calculate center alignment for the button
+                const centerButton = document.createElement('button');
+                centerButton.className = 'center-button';
+                centerButton.textContent = "Use This Board";
+                centerButton.addEventListener('click', () => fillMainBoard(boardArray));
+                
+                wrapper.appendChild(boardGrid);
+                wrapper.appendChild(centerButton);
+                container.appendChild(wrapper);
+            } else {
+                container.appendChild(boardGrid);
+            }
+        }
+
+        function fillMainBoard(boardArray) {
+            board = boardArray.map(row => row.slice()); // Deep copy of the board
+            generateBoardFromData(board);
+        }
+
+        function generateBoardFromData(data) {
+            const gridContainer = document.getElementById('boardGrid');
+            gridContainer.innerHTML = '';
+            const rows = data.length;
+            const cols = data[0].length;
+            document.getElementById('rows').value = rows;
+            document.getElementById('cols').value = cols;
+
+            for (let r = 0; r < rows; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'grid-row';
+                for (let c = 0; c < cols; c++) {
+                    const cellDiv = document.createElement('div');
+                    cellDiv.className = 'grid-cell';
+                    cellDiv.textContent = data[r][c];
+                    if (data[r][c] === 1) {
+                        cellDiv.classList.add('active');
+                    }
+                    cellDiv.dataset.row = r;
+                    cellDiv.dataset.col = c;
+                    cellDiv.addEventListener('click', toggleBoardCell);
+                    rowDiv.appendChild(cellDiv);
+                }
+                gridContainer.appendChild(rowDiv);
+            }
         }
 
         function createJsonTree(node, container) {
@@ -376,7 +435,7 @@
                     div.appendChild(boardLabel);
 
                     const boardContainer = document.createElement('div');
-                    renderBoard(node[key], boardContainer);
+                    renderBoard(node[key], boardContainer, true); // Align center button
                     div.appendChild(boardContainer);
 
                 } else if (key === "next" && node[key]) {
